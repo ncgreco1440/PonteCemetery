@@ -57,6 +57,12 @@ namespace PonteCemetery
             }
         }
 
+        private void OnDestroy()
+        {
+            m_Material.SetTexture("_NameNormal", m_DefaultTexture);
+            m_Material.SetFloat("_NameNormalStrength", 3f);
+        }
+
         private IEnumerator DisplayIndicator()
         {
             yield return Reset();

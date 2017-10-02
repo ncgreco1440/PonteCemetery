@@ -8,11 +8,18 @@ namespace PonteCemetery.GamePlay
         public RingAroundTheRosieTrigger m_Adjacent;
         public Material m_Material;
         public Material[] m_StartingMaterials;
+        private Texture m_DefaultMaterial;
         public Texture[] m_Textures;
         public bool m_Next = false;
         public bool m_Start = false;
         public int m_Iter = -1;
         public MetalGate m_MetalGate;
+
+        private void Start()
+        {
+            m_DefaultMaterial = m_Material.GetTexture("_NameNormal");
+            m_Material.SetFloat("_NameNormalStrength", 3f);
+        }
 
         private void OnTriggerEnter()
         {
@@ -31,13 +38,22 @@ namespace PonteCemetery.GamePlay
                 RingAroundTheRosie.Instance.IncrementStage();
 
                 if (RingAroundTheRosie.Instance.CurrentStage() == 21)
+                {
                     m_MetalGate.ForceOpen();
+                    Audio.Ambience.Instance.StartCoroutine(Audio.Ambience.BeginAmbience(0));
+                }
 
                 if (m_Iter + 1 <= m_Textures.Length - 1)
                     m_Material.SetTexture("_NameNormal", m_Textures[++m_Iter]);
                 else
                     m_Material.SetTexture("_NameNormal", null);
             }
+        }
+
+        private void OnDestroy()
+        {
+            m_Material.SetTexture("_NameNormal", m_DefaultMaterial);
+            m_Material.SetFloat("_NameNormalStrength", 3f);
         }
 
         private IEnumerator StartPlaying()

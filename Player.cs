@@ -8,6 +8,7 @@ namespace PonteCemetery
     public class Player : MonoBehaviour
     {
         private static Player m_Instance = null;
+
         private Transform m_Transform;
         public Transform m_CameraTransform;
         public List<long> m_KeyChain = new List<long>();
@@ -24,6 +25,16 @@ namespace PonteCemetery
                 Debug.LogError("You have multiple instantiations of 'Player'. This forbidden. Please remove all but one instance of 'Player'.");
                 MenuAction.Quit();
             }
+        }
+
+        public static SphereCollider LostIndication()
+        {
+            return m_Instance.m_LostIndictator;
+        }
+
+        public static bool WasLost()
+        {
+            return m_Instance.m_LostIndictator.enabled;
         }
 
         public static void IsLost()

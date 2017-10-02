@@ -72,7 +72,10 @@ namespace PonteCemetery.GamePlay.Interactables
 
         public virtual bool TryAction()
         {
-            return Player.HasKey(m_KeyCode);
+            if (m_Locked)
+                return Player.HasKey(m_KeyCode);
+            else
+                return true;
         }
 
         public virtual void PlaySound(ref AudioClip clip)
