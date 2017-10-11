@@ -9,19 +9,19 @@ namespace PonteCemetery.GamePlay
 
         public void OnTriggerEnter()
         {
-            if (SetGrave.Stage == 0)
+            if (SetGrave.Instance.CurrentStage() < 2)
                 m_EndMaterial.SetTexture("_NameNormal", m_Textures[2]);
 
-            if(SetGrave.Stage == 1)
+            if(SetGrave.Instance.CurrentStage() == 2)
                 m_EndMaterial.SetTexture("_NameNormal", m_Textures[0]);
 
-            if(SetGrave.Stage == 2)
+            if(SetGrave.Instance.CurrentStage() == 3)
                 m_EndMaterial.SetTexture("_NameNormal", m_Textures[1]);
 
-            if (SetGrave.Stage == 3)
+            if (SetGrave.Instance.CurrentStage() == 4)
             {
                 m_EndMaterial.SetTexture("_NameNormal", m_Textures[2]);
-                SetGrave.Stage = 4;
+                SetGrave.Instance.IncrementStage();
             }
         }
     }

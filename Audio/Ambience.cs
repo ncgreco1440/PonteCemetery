@@ -10,6 +10,8 @@ namespace PonteCemetery.Audio
         public AudioSource m_AudioSource;
         public List<AudioClip> m_AmbientSounds;
 
+        private bool m_Done;
+
         private void Awake()
         {
             m_Instance = this;
@@ -23,6 +25,10 @@ namespace PonteCemetery.Audio
             }
         }
 
+        private void LateUpdate()
+        {
+        }
+
         public static IEnumerator BeginAmbience(int index)
         {
             yield return m_Instance.StartCoroutine(EndAmbience());
@@ -30,7 +36,7 @@ namespace PonteCemetery.Audio
             m_Instance.m_AudioSource.Play();
             while (m_Instance.m_AudioSource.volume + 0.05f <= 1)
             {
-                m_Instance.m_AudioSource.volume += 0.05f;
+                m_Instance.m_Done = (m_Instance.m_AudioSource.volume += 0.05f) >= 1.0f;
                 yield return new WaitForSecondsRealtime(0.33f);
             }
         }

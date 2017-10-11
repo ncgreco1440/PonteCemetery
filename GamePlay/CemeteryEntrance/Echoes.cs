@@ -20,10 +20,10 @@ namespace PonteCemetery.GamePlay
 
         private IEnumerator ExpandPlayerLostSphere()
         {
-            while(t < 3.0f)
+            while(t < 10.0f)
             {
                 t += Time.fixedDeltaTime;
-                Player.LostIndication().radius += 1.25f;
+                Player.LostIndication().radius += 0.5f;
                 yield return secondsToWait;
             }
         }

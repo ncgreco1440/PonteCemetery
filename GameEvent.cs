@@ -9,6 +9,7 @@ namespace PonteCemetery
         public string m_EventName = "GameEvent";
         [SerializeField]
         protected bool m_Completed = false;
+        [SerializeField]
         protected int m_Stage = 0;
         public int m_NumStages = 1;
 
@@ -47,6 +48,16 @@ namespace PonteCemetery
                 m_Stage++;
                 m_Completed = m_Stage == m_NumStages - 1;
             }
+        }
+
+        /// <summary>
+        /// Forces the GameEvent to a certain stage, will set the GameEvent's completed status
+        /// </summary>
+        /// <param name="i"></param>
+        public virtual void ForceStage(int i)
+        {
+            m_Stage = i;
+            m_Completed = m_Stage == m_NumStages - 1;
         }
 
         /// <summary>

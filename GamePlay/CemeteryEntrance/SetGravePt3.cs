@@ -18,14 +18,17 @@ namespace PonteCemetery.GamePlay
         {
             if(collider.gameObject.tag == "Player")
             {
-                if (SetGrave.Stage == 1)
+                if (SetGrave.Instance.CurrentStage() == 2)
                 {
-                    SetGrave.Stage = 2;
+                    SetGrave.Instance.PlaySound(3);
+                    SetGrave.Instance.IncrementStage();
+                    //EndVoices();
                 }
 
-                if (SetGrave.Stage == 4)
+                if (SetGrave.Instance.CurrentStage() == 5)
                 {
-                    SetGrave.Stage = 5;
+                    EndVoices();
+                    SetGrave.Instance.IncrementStage();
                     m_GravekeeperCabinDoor.ForceOpen();
                 }
             }
@@ -38,7 +41,8 @@ namespace PonteCemetery.GamePlay
 
         public static void EndVoices()
         {
-            Instance.m_AudioSource.Stop();
+            Instance.m_AudioSource.loop = false;
+            //Instance.m_AudioSource.Stop();
         }
     }
 }

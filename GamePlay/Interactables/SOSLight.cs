@@ -2,11 +2,12 @@
 using Overtop.Scripts.Interactables;
 using System.Collections;
 using PonteCemetery.GamePlay;
+using System;
 
 namespace PonteCemtery.GamePlay.Interactables
 {
     [RequireComponent(typeof(Light))]
-    public class SOSLight : MonoBehaviour, IInteractable
+    public class SOSLight : IInteractable
     {
         private Light m_Light;
         private bool m_Signaling = true;
@@ -32,14 +33,13 @@ namespace PonteCemtery.GamePlay.Interactables
 
         public RingAroundTheRosieTrigger m_BeginRingAroundTheRosie;
         public MetalGate m_GravekeeperGate;
-        public Material m_LetsPlay;
-        public Texture m_LetsPlayTexture;
 
         private void Awake()
         {
             m_Light = GetComponent<Light>();
             m_OrigIntensity = m_Light.intensity;
             m_AudioSource.clip = m_AudioClips[0];
+            m_AudioSource.loop = false;
         }
 
         private void OnEnable()
@@ -85,6 +85,16 @@ namespace PonteCemtery.GamePlay.Interactables
             }
         }
 
+        public void Reset()
+        {
+            m_Signaling = true;
+            m_AudioSource.loop = false;
+            m_AudioSource.Play();
+            m_GravekeeperGate.Reset();
+            gameObject.layer = LayerMask.NameToLayer("Interactions");
+            OnEnable();
+        }
+
         private float Duration
         {
             get
@@ -109,23 +119,38 @@ namespace PonteCemtery.GamePlay.Interactables
         /// <summary>
         /// Cease SOS signal
         /// </summary>
-        public void Interact()
+        public override void Interact()
         {
             m_Light.intensity = 0;
             m_Bulb.material = m_BulbOff;
             m_Signaling = false;
+            m_AudioSource.loop = false;
             m_AudioSource.Stop();
-            PonteCemetery.Audio.Ambience.Instance.StartCoroutine(PonteCemetery.Audio.Ambience.BeginAmbience(1));
+            //PonteCemetery.Audio.Ambience.Instance.StartCoroutine(PonteCemetery.Audio.Ambience.BeginAmbience(1));
             m_GravekeeperGate.Reset();
             m_GravekeeperGate.SwapKey(123L);
-            m_LetsPlay.SetTexture("_NameNormal", m_LetsPlayTexture);
-            m_BeginRingAroundTheRosie.m_Next = true;
-            m_BeginRingAroundTheRosie.m_Start = true;
+            m_GravekeeperGate.m_ReasonForFailedInteraction = "This gate won't open anymore.";
+            gameObject.layer = LayerMask.NameToLayer("Default");
+            RingAroundTheRosie.Instance.m_CanBegin = true;
         }
 
-        public bool TryAction()
+        public override bool TryAction()
         {
             return true;
+        }
+
+        public void TurnOn()
+        {
+            StartCoroutine(LightUp());
+        }
+
+        private IEnumerator LightUp()
+        {
+            while(m_Light.intensity < 4.0f)
+            {
+                m_Light.intensity += 0.25f;
+                yield return new WaitForSeconds(0.33f);
+            }
         }
     }
 }

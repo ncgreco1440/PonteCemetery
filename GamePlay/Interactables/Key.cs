@@ -1,25 +1,39 @@
-﻿using Overtop.Scripts.Interactables;
+﻿using System;
+using Overtop.Scripts.Interactables;
 using UnityEngine;
 
 namespace PonteCemetery.GamePlay.Interactables
 {
-    public class Key : MonoBehaviour, IInteractable
+    public class Key : IInteractable
     {
         [SerializeField]
         private long m_Code = 0L;
 
         /// <summary>
-        /// Adds key to player's inventory, remove key from the scene
+        /// Adds key to player's inventory, hides the key in the scene
         /// </summary>
-        public virtual void Interact()
+        public override void Interact()
         {
             Player.AddToKeyChain(m_Code);
-            Destroy(gameObject);
+            gameObject.GetComponent<MeshRenderer>().enabled = false;
+            gameObject.layer = LayerMask.NameToLayer("Default");
+            //Destroy(gameObject);
+            InvokeInteractiveFeedbackEvent(m_ReasonForSuccessInteraction);
         }
 
-        public virtual bool TryAction()
+        public override string InteractableName()
+        {
+            return m_InteractName;
+        }
+
+        public override bool TryAction()
         {
             return true;
+        }
+
+        public override string WhyInteractFailed()
+        {
+            return m_ReasonForFailedInteraction;
         }
     }
 }

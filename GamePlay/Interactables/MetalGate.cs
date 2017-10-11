@@ -23,7 +23,7 @@ namespace PonteCemetery.GamePlay
         private Quaternion m_ClosedRightGateRotation;
         private Quaternion m_ClosedLeftGateRotation;
 
-        private void Awake()
+        public override void Awake()
         {
             m_InteractableCollider = GetComponent<BoxCollider>();
             m_AudioSource = GetComponent<AudioSource>();
@@ -37,13 +37,15 @@ namespace PonteCemetery.GamePlay
             {
                 base.PlaySound(ref m_OpeningSound);
                 base.Interact();
-                //Destroy(m_InteractableCollider);
                 m_InteractableCollider.enabled = false;
+                m_RightGate.gameObject.layer = LayerMask.NameToLayer("Action");
+                m_LeftGate.gameObject.layer = LayerMask.NameToLayer("Action");
                 m_Unlocked = true;
             }
             else
             {
                 base.PlaySound(ref m_LockedSound);
+                InvokeInteractiveFeedbackEvent(m_ReasonForFailedInteraction);
             }
         }
 
@@ -60,6 +62,8 @@ namespace PonteCemetery.GamePlay
                 if (m_Opened)
                 {
                     gameObject.layer = LayerMask.NameToLayer("Fence");
+                    m_RightGate.gameObject.layer = LayerMask.NameToLayer("Fence");
+                    m_LeftGate.gameObject.layer = LayerMask.NameToLayer("Fence");
                 }
             }
         }
@@ -68,7 +72,8 @@ namespace PonteCemetery.GamePlay
         {
             base.PlaySound(ref m_OpeningSound);
             base.Interact();
-            //Destroy(m_InteractableCollider);
+            m_RightGate.gameObject.layer = LayerMask.NameToLayer("Action");
+            m_LeftGate.gameObject.layer = LayerMask.NameToLayer("Action");
             m_InteractableCollider.enabled = false;
             m_Unlocked = true;
         }
@@ -77,12 +82,30 @@ namespace PonteCemetery.GamePlay
         {
             m_Locked = m_InteractableCollider.enabled = true;
             gameObject.layer = LayerMask.NameToLayer("Interactions");
+            m_RightGate.gameObject.layer = LayerMask.NameToLayer("Fence");
+            m_LeftGate.gameObject.layer = LayerMask.NameToLayer("Fence");
             m_Unlocked = m_Opened = m_RightGate.isKinematic = m_LeftGate.isKinematic = false;
             m_TimePassed = 0.0f;
             m_RightGate.transform.localRotation = m_ClosedRightGateRotation;
             m_LeftGate.transform.localRotation = m_ClosedLeftGateRotation;
             m_AudioSource.clip = m_ClosingSound;
             m_AudioSource.Play();
+        }
+
+        public void Unlock()
+        {
+            m_Locked = false;
+        }
+
+        public void Lock()
+        {
+            m_Locked = true;
+        }
+
+        public void Lock(long key)
+        {
+            m_Locked = true;
+            m_KeyCode = key;
         }
 
         public void SwapKey(long newKeyCode)

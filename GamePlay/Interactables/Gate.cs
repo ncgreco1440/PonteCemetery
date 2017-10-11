@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace PonteCemetery.GamePlay.Interactables
 {
-    public class Gate : MonoBehaviour, IInteractable
+    public class Gate : IInteractable
     {
         [SerializeField]
         protected bool m_Locked = false;
@@ -19,8 +19,12 @@ namespace PonteCemetery.GamePlay.Interactables
         [SerializeField]
         protected long m_KeyCode;
         public AudioSource m_AudioSource;
+        public AudioSource m_AudioSource2;
+        public AudioSource m_AudioSource3;
+        public AudioSource m_AudioSource4;
+        public AudioSource m_AudioSource5;
 
-        private void Awake()
+        public virtual void Awake()
         {
             try
             {
@@ -31,7 +35,7 @@ namespace PonteCemetery.GamePlay.Interactables
             catch(System.Exception e) {}
         }
 
-        private void Start()
+        public virtual void Start()
         {
             gameObject.layer = LayerMask.NameToLayer("Interactions");
             m_UnlockedJointLimits = m_HingeJoint.limits;
@@ -65,12 +69,12 @@ namespace PonteCemetery.GamePlay.Interactables
         /// 2. Opens the gate if already unlocked.
         /// 3. Informs the player the gate is locked.
         /// </summary>
-        public virtual void Interact()
+        public override void Interact()
         {
             OpenGate();
         }
 
-        public virtual bool TryAction()
+        public override bool TryAction()
         {
             if (m_Locked)
                 return Player.HasKey(m_KeyCode);
@@ -84,6 +88,18 @@ namespace PonteCemetery.GamePlay.Interactables
             {
                 m_AudioSource.clip = clip;
                 m_AudioSource.Play();
+            }else if(!m_AudioSource2.isPlaying)
+            {
+                m_AudioSource2.clip = clip;
+                m_AudioSource2.Play();
+            }else if(!m_AudioSource3.isPlaying)
+            {
+                m_AudioSource3.clip = clip;
+                m_AudioSource3.Play();
+            }else if (!m_AudioSource4.isPlaying)
+            {
+                m_AudioSource4.clip = clip;
+                m_AudioSource4.Play();
             }
         }
 
