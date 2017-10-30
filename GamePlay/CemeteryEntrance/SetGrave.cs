@@ -48,8 +48,8 @@ namespace PonteCemetery.GamePlay
                 m_AudioSource.spatialBlend = 1f;
             }
 
-            if (m_Stage == 3)
-                StageThree();
+            //if (m_Stage == 3) // Do not run this...
+            //    StageThree(); // There is no Stage 3 on this grave...
             if (m_Stage == 0)
                 StageZero();
         }
@@ -64,13 +64,21 @@ namespace PonteCemetery.GamePlay
             if (m_PlayerNear && m_Stage == 1)
             {
                 m_Angle = Vector3.Angle(Player.Transform().forward, m_Transform.forward);
-
                 if (m_Angle >= 130f)
                 {
                     m_EndMaterial.SetTexture("_NameNormal", m_Textures[1]);
                     IncrementStage(); // Goto stage 2
-                    //SetGravePt3.BeginVoices();
                     PlaySound(1);
+                }
+            }
+
+            if (m_PlayerNear && m_Stage == 2)
+            {
+                m_Angle = Vector3.Angle(Player.Transform().forward, m_Transform.forward);
+                if (m_Angle <= 55f)
+                {
+                    IncrementStage(); // Goto stage 3
+                    SetGravePt3.BeginVoices();
                 }
             }
         }

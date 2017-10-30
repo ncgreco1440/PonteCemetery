@@ -35,7 +35,7 @@ namespace PonteCemetery.GamePlay
             if (m_Type == TriggerType.EndWalk)
             {
                 TheWalk.Instance().IncrementStage();
-                TheWalk.Instance().Laugh(2);
+                GameEventRun.Instance.IncrementStage();
             }
 
             if (m_Type == TriggerType.Entrap)

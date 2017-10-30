@@ -1,9 +1,10 @@
-﻿using PonteCemetery.GamePlay.Interactables;
+﻿using Overtop.Scripts.Interactables;
+using PonteCemetery.GamePlay.Interactables;
 using UnityEngine;
 
 namespace PonteCemetery.GamePlay
 {
-    public class SetGravePt3 : MonoBehaviour
+    public class SetGravePt3 : IInteractable
     {
         public static SetGravePt3 Instance;
         public AudioSource m_AudioSource;
@@ -12,25 +13,21 @@ namespace PonteCemetery.GamePlay
         private void Awake()
         {
             Instance = this;
+            m_Collider = GetComponent<BoxCollider>();
         }
 
-        public void OnTriggerEnter(Collider collider)
+        public override void Interact()
         {
-            if(collider.gameObject.tag == "Player")
+            if(SetGrave.Instance.CurrentStage() == 3)
             {
-                if (SetGrave.Instance.CurrentStage() == 2)
-                {
-                    SetGrave.Instance.PlaySound(3);
-                    SetGrave.Instance.IncrementStage();
-                    //EndVoices();
-                }
-
-                if (SetGrave.Instance.CurrentStage() == 5)
-                {
-                    EndVoices();
-                    SetGrave.Instance.IncrementStage();
-                    m_GravekeeperCabinDoor.ForceOpen();
-                }
+                m_GravekeeperCabinDoor.ForceOpen();
+                Disable();
+                EndVoices();
+                InvokeInteractiveFeedbackEvent(m_ReasonForSuccessInteraction);
+            }
+            else
+            {
+                InvokeInteractiveFeedbackEvent(m_ReasonForFailedInteraction);
             }
         }
 
@@ -42,7 +39,6 @@ namespace PonteCemetery.GamePlay
         public static void EndVoices()
         {
             Instance.m_AudioSource.loop = false;
-            //Instance.m_AudioSource.Stop();
         }
     }
 }

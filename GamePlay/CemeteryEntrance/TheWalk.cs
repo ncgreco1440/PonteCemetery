@@ -1,7 +1,5 @@
-﻿using Overtop.Managers;
-using PonteCemetery.GamePlay.Interactables;
+﻿using PonteCemetery.GamePlay.Interactables;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace PonteCemetery.GamePlay
@@ -12,14 +10,14 @@ namespace PonteCemetery.GamePlay
         public Rigidbody m_GateRigidbody;
         public WoodenDoor m_Gate;
         public MetalGate m_MetalGate;
-        public BoxCollider m_BeginWalkTrigger;
-        public BoxCollider m_EndWalkTrigger;
-        public BoxCollider m_EntrapTrigger;
+        //public BoxCollider m_BeginWalkTrigger;
+        //public BoxCollider m_EndWalkTrigger;
+        //public BoxCollider m_EntrapTrigger;
 
-        public Material[] m_LightBulbMaterials;
-        public MeshRenderer[] m_LightMeshes;
-        public Light[] m_Lights;
+        public FlickeringLights m_FlickerLights;
         public AudioSource[] m_Laughs;
+
+        public AudioClip[] m_Sounds;
 
         private void Awake()
         {
@@ -40,12 +38,26 @@ namespace PonteCemetery.GamePlay
         {
             if(CurrentStage() == 0)
             {
-                Audio.Ambience.Instance.StartCoroutine(Audio.Ambience.BeginAmbience(2));
+                Audio.Ambience.SwapAmbience(2, 0.25f);
                 IncrementStage();
-                m_MetalGate.Reset();
+                m_MetalGate.ForceClose();
+                m_MetalGate.Lock();
                 m_GateRigidbody.drag = 1;
+                m_Laughs[2].Play();
                 StartCoroutine(RepeatedGateSlamming());
-                StartCoroutine(FlickeringLights());
+            }
+        }
+
+        public override void IncrementStage()
+        {
+            base.IncrementStage();
+            if(CurrentStage() == 1)
+            {
+                m_FlickerLights.BeginFlickering(m_Sounds[0]);
+            }
+            if(CurrentStage() == 2)
+            {
+                m_FlickerLights.EndFlickering(m_Sounds[0]);
             }
         }
 
@@ -74,47 +86,6 @@ namespace PonteCemetery.GamePlay
                 yield return new WaitForSeconds(1.0f);
             }
             m_Gate.ForceOpen();
-        }
-
-        private IEnumerator FlickeringLights()
-        {
-            while(CurrentStage() == 1)
-            {
-                for (int i = 0; i < m_Lights.Length; i++)
-                {
-                    m_Lights[i].enabled = true;
-                    m_LightMeshes[i].material = m_LightBulbMaterials[0];
-                }
-                    
-                yield return new WaitForSeconds(0.25f);
-
-                for (int i = 0; i < m_Lights.Length; i++)
-                {
-                    m_Lights[i].enabled = false;
-                    m_LightMeshes[i].material = m_LightBulbMaterials[1];
-                }
-
-                yield return new WaitForSeconds(0.25f);
-            }
-
-            StartCoroutine(FadeLights());
-        }
-
-        private IEnumerator FadeLights()
-        {
-            for (int i = 0; i < m_Lights.Length; i++)
-            {
-                m_Lights[i].intensity = 0.0f;
-                m_Lights[i].enabled = true;
-                m_LightMeshes[i].material = m_LightBulbMaterials[0];
-            }
-                
-            while (m_Lights[0].intensity < 2.25f)
-            {
-                yield return new WaitForSeconds(0.2f);
-                for (int i = 0; i < m_Lights.Length; i++)
-                    m_Lights[i].intensity += 0.12f;
-            }
         }
 
         public override void ResetStages()

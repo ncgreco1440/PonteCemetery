@@ -58,8 +58,8 @@ namespace PonteCemtery.GamePlay.Interactables
         {
             while(m_Signaling)
             {
-                yield return new WaitForSeconds(25.0f);
                 m_AudioSource.Play();
+                yield return new WaitForSeconds(25.0f);
             }
         }
 
@@ -126,8 +126,8 @@ namespace PonteCemtery.GamePlay.Interactables
             m_Signaling = false;
             m_AudioSource.loop = false;
             m_AudioSource.Stop();
-            //PonteCemetery.Audio.Ambience.Instance.StartCoroutine(PonteCemetery.Audio.Ambience.BeginAmbience(1));
-            m_GravekeeperGate.Reset();
+            PonteCemetery.Audio.Ambience.SwapAmbience(4, 0.25f);
+            m_GravekeeperGate.ForceClose(true);
             m_GravekeeperGate.SwapKey(123L);
             m_GravekeeperGate.m_ReasonForFailedInteraction = "This gate won't open anymore.";
             gameObject.layer = LayerMask.NameToLayer("Default");

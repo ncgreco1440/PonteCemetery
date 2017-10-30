@@ -15,9 +15,7 @@ namespace PonteCemetery.GamePlay.Interactables
         public override void Interact()
         {
             Player.AddToKeyChain(m_Code);
-            gameObject.GetComponent<MeshRenderer>().enabled = false;
-            gameObject.layer = LayerMask.NameToLayer("Default");
-            //Destroy(gameObject);
+            Destroy(gameObject);
             InvokeInteractiveFeedbackEvent(m_ReasonForSuccessInteraction);
         }
 

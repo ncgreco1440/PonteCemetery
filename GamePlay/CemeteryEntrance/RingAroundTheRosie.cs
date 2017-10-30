@@ -13,8 +13,11 @@ namespace PonteCemetery.GamePlay
         public bool m_CanBegin = false;
         public SOSLight m_light;
         public bool m_Resetting = false;
+        [SerializeField]
+        private bool m_Active = false;
 
         public RingAroundTheRosieTrigger[] m_Triggers;
+        public RingAroundTheRosieActivate m_Activator;
 
         private void Awake()
         {
@@ -35,6 +38,7 @@ namespace PonteCemetery.GamePlay
                 m_StartingTrigger.m_Next = true;
                 m_CanBegin = false;
                 m_LetsPlay.SetTexture("_NameNormal", m_LetsPlayTexture);
+                m_Activator.gameObject.SetActive(true);
             }
         }
 
@@ -46,8 +50,6 @@ namespace PonteCemetery.GamePlay
             m_Resetting = true;
             base.ResetStages();
             StartCoroutine(ResetAllGraves());
-            //m_StartingTrigger.m_Start = true;
-            //m_StartingTrigger.m_Next = true;
         }
 
         private IEnumerator ResetAllGraves()
@@ -56,11 +58,22 @@ namespace PonteCemetery.GamePlay
             StartCoroutine(m_Triggers[1].FadeOut());
             StartCoroutine(m_Triggers[2].FadeOut());
             StartCoroutine(m_Triggers[3].FadeOut());
-            yield return new WaitForSeconds(5.0f);
-            m_Resetting = false;
+            m_Triggers[0].EnteredZone(false);
+            m_Triggers[1].EnteredZone(false);
+            m_Triggers[2].EnteredZone(false);
+            m_Triggers[3].EnteredZone(false);
+            yield return StartCoroutine(BeginAfterTime());
             m_LetsPlay.SetTexture("_NameNormal", m_LetsPlayTexture);
+            m_Activator.gameObject.SetActive(true);
+        }
+
+        private IEnumerator BeginAfterTime()
+        {
+            yield return new WaitForSeconds(5.0f);
             m_StartingTrigger.m_Start = true;
             m_StartingTrigger.m_Next = true;
+            m_Resetting = false;
+            m_StartingTrigger.EnteredZone(true);
         }
 
         public bool Resetting()
@@ -79,6 +92,17 @@ namespace PonteCemetery.GamePlay
             m_StartingTrigger.m_Start = false;
             m_StartingTrigger.m_Next = false;
             m_CanBegin = false;
+        }
+
+        public bool Active
+        {
+            get { return m_Active; }
+            set
+            {
+                if (!value)
+                    m_Activator.Enable();
+                m_Active = value;
+            }
         }
     }
 }

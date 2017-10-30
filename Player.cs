@@ -11,6 +11,7 @@ namespace PonteCemetery
 
         private Transform m_Transform;
         public Transform m_CameraTransform;
+        public Camera m_Camera;
         public List<long> m_KeyChain = new List<long>();
         public AudioSource m_AudioSource;
         public SphereCollider m_LostIndictator;
@@ -87,6 +88,11 @@ namespace PonteCemetery
         public static void PlaySoundFromBehind()
         {
             m_Instance.m_AudioSource.Play();
+        }
+
+        public static void CloseEyes()
+        {
+            m_Instance.m_Camera.enabled = false;
         }
     }
 }

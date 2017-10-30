@@ -11,6 +11,13 @@ namespace PonteCemetery.Utils
         public static FastSceneLoad Instance = null;
         public Canvas m_LoadingScreen;
         public Camera m_LoadingCam;
+        [SerializeField]
+        private string m_CurrentScene = "";
+        [SerializeField]
+        private string m_SceneToLoad = "";
+        [SerializeField]
+        private bool m_BaseSceneLoaded = false;
+
         AsyncOperation m_CemeteryEntranceAsyncLoader = new AsyncOperation();
         AsyncOperation m_CommonGraveyardAsyncLoader = new AsyncOperation();
         AsyncOperation m_ChurchAsyncLoader = new AsyncOperation();
@@ -24,9 +31,9 @@ namespace PonteCemetery.Utils
 
         private void Start()
         {
-            m_CemeteryEntranceAsyncLoader = SceneManager.LoadSceneAsync("Cemetery_Entrance", LoadSceneMode.Additive);
+            //m_CemeteryEntranceAsyncLoader = SceneManager.LoadSceneAsync("Cemetery_Entrance", LoadSceneMode.Additive);
             //m_CommonGraveyardAsyncLoader = SceneManager.LoadSceneAsync("Common_Graveyard", LoadSceneMode.Additive);
-            m_ChurchAsyncLoader = SceneManager.LoadSceneAsync("Church", LoadSceneMode.Additive);
+            //m_ChurchAsyncLoader = SceneManager.LoadSceneAsync("Church", LoadSceneMode.Additive);
             //m_ChurchAsyncLoader.allowSceneActivation = false;
             //m_RoyalGraveyardAsyncLoader = SceneManager.LoadSceneAsync("Royal_Graveyard", LoadSceneMode.Additive);
             SceneManager.sceneLoaded += SceneLoaded;
@@ -38,6 +45,7 @@ namespace PonteCemetery.Utils
             if (scene.name == "Base_Scene")
             {
                 SceneManager.SetActiveScene(SceneManager.GetSceneByName("Base_Scene"));
+                m_BaseSceneLoaded = true;
                 EndLoad();
                 //m_CommonGraveyardAsyncLoader = SceneManager.LoadSceneAsync("Common_Graveyard", LoadSceneMode.Additive);
                 //m_CommonGraveyardAsyncLoader.allowSceneActivation = false;
@@ -47,20 +55,40 @@ namespace PonteCemetery.Utils
                 //m_RoyalGraveyardAsyncLoader.allowSceneActivation = false;
             }
 
-            if(scene.name == "Cemetery_Entrance" && GameManager.Dirty)
+            if(scene.name == "Cemetery_Entrance")
             {
-                GameManager.NewPlayer();
+                SceneManager.UnloadSceneAsync("Title");
                 GameManager.SetCurrentGameState(new GameState());
                 GameManager.GameStarted = true;
+                m_CurrentScene = "Cemetery_Entrance";
                 EndLoad();
+            }
+
+            if(scene.name == "Title")
+            {
+                if(!InputManager.ControllerIsConnected)
+                {
+                    Cursor.lockState = CursorLockMode.Confined;
+                    Cursor.visible = true;
+                }
+
+                m_CurrentScene = "Title";
+                GameManager.PlayerEyesOpen();
+                if (m_BaseSceneLoaded)
+                    EndLoad();
             }
         }
 
         public void SceneUnloaded(Scene scene)
         {
-            if (scene.name == "Cemetery_Entrance")
+            if (scene.name == "Cemetery_Entrance" && m_SceneToLoad == "Cemetery_Entrance")
             {
                 SceneManager.LoadSceneAsync("Cemetery_Entrance", LoadSceneMode.Additive);
+            }
+            else
+            {
+                if(!GameManager.GameStarted)
+                    SceneManager.LoadSceneAsync("Title", LoadSceneMode.Additive);
             }
         }
 
@@ -69,13 +97,27 @@ namespace PonteCemetery.Utils
             GameManager.DestroyPlayer();
             m_LoadingCam.gameObject.SetActive(true);
             m_LoadingScreen.gameObject.SetActive(true);
-            SceneManager.UnloadSceneAsync("Cemetery_Entrance");
+            m_SceneToLoad = "Cemetery_Entrance";
+            SceneManager.LoadSceneAsync("Cemetery_Entrance", LoadSceneMode.Additive);
         }
 
         public void EndLoad()
         {
             m_LoadingCam.gameObject.SetActive(false);
             m_LoadingScreen.gameObject.SetActive(false);
+        }
+
+        public static void GoToScene(string scene)
+        {
+            Instance.m_SceneToLoad = scene;
+            Instance.m_LoadingCam.gameObject.SetActive(true);
+            Instance.m_LoadingScreen.gameObject.SetActive(true);
+            SceneManager.UnloadSceneAsync("Cemetery_Entrance");            
+        }
+
+        public static string CurrentScene()
+        {
+            return Instance.m_CurrentScene;
         }
     }
 }

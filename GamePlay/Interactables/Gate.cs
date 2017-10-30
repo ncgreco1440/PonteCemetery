@@ -117,6 +117,8 @@ namespace PonteCemetery.GamePlay.Interactables
 
         public virtual void ForceClose() { }
 
+        public virtual void ForceClose(bool locked) { }
+
         public virtual void Reset() { }
     }
 }
